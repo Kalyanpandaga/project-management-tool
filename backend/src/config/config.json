@@ -1,0 +1,14 @@
+{
+  "development": {
+    "url": "sqlite:./database.sqlite",
+    "dialect": "sqlite"
+  },
+  "test": {
+    "url": "sqlite::memory:",
+    "dialect": "sqlite"
+  },
+  "production": {
+    "url": "sqlite:./database.sqlite",
+    "dialect": "sqlite"
+  }
+}
