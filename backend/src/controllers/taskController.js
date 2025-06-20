@@ -15,8 +15,6 @@ const createTask = async (req, res, next) => {
         createError(404, "USER_NOT_FOUND", "Assigned user not found")
       );
 
-    console.log(projectId);
-
     const task = await Task.create({
       title,
       description,
@@ -25,7 +23,6 @@ const createTask = async (req, res, next) => {
       projectId,
       assignedTo,
     });
-    console.log(task);
     res.status(201).json({ task });
   } catch (err) {
     next(err);
