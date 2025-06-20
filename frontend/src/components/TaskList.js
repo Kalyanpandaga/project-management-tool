@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { FaPlus, FaTrashAlt } from "react-icons/fa";
 
 const TaskList = () => {
   const { user } = useAuth();
@@ -89,21 +90,22 @@ const TaskList = () => {
 
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
         <h1 className="text-2xl font-bold">Tasks</h1>
         {(user.role === "Admin" || user.role === "Manager") && (
           <button
-            className="bg-blue-600 text-white px-4 py-2 rounded"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2"
             onClick={() => setShowForm(!showForm)}
           >
-            {showForm ? "Cancel" : "New Task"}
+            <FaPlus /> {showForm ? "Cancel" : "New Task"}
           </button>
         )}
       </div>
-      <div className="mb-4 flex flex-wrap gap-4 items-center">
-        <label className="mr-2">Filter by status:</label>
+
+      <div className="mb-6 flex flex-wrap items-center gap-4">
+        <label className="font-medium">Filter by status:</label>
         <select
-          className="border px-2 py-1 rounded"
+          className="border px-3 py-2 rounded"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
         >
@@ -113,24 +115,28 @@ const TaskList = () => {
           <option value="Done">Done</option>
         </select>
       </div>
+
       {showForm && (
-        <form onSubmit={handleCreate} className="mb-4 space-y-2 max-w-lg">
+        <form
+          onSubmit={handleCreate}
+          className="mb-8 space-y-4 max-w-2xl bg-gray-50 p-6 rounded-lg shadow"
+        >
           <input
-            className="border px-2 py-1 rounded w-full"
+            className="border px-3 py-2 rounded w-full"
             placeholder="Title"
             value={form.title}
             onChange={(e) => setForm({ ...form, title: e.target.value })}
             required
           />
           <textarea
-            className="border px-2 py-1 rounded w-full"
+            className="border px-3 py-2 rounded w-full"
             placeholder="Description"
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
             required
           />
           <select
-            className="border px-2 py-1 rounded w-full"
+            className="border px-3 py-2 rounded w-full"
             value={form.status}
             onChange={(e) => setForm({ ...form, status: e.target.value })}
           >
@@ -140,13 +146,13 @@ const TaskList = () => {
           </select>
           <input
             type="date"
-            className="border px-2 py-1 rounded w-full"
+            className="border px-3 py-2 rounded w-full"
             value={form.deadline}
             onChange={(e) => setForm({ ...form, deadline: e.target.value })}
             required
           />
           <select
-            className="border px-2 py-1 rounded w-full"
+            className="border px-3 py-2 rounded w-full"
             value={form.projectId}
             onChange={(e) =>
               setForm({ ...form, projectId: e.target.value, assignedTo: "" })
@@ -161,7 +167,7 @@ const TaskList = () => {
             ))}
           </select>
           <select
-            className="border px-2 py-1 rounded w-full"
+            className="border px-3 py-2 rounded w-full"
             value={form.assignedTo}
             onChange={(e) => setForm({ ...form, assignedTo: e.target.value })}
             required
@@ -176,35 +182,58 @@ const TaskList = () => {
           </select>
           <button
             type="submit"
-            className="bg-green-600 text-white px-4 py-2 rounded"
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
           >
             Create Task
           </button>
         </form>
       )}
+
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white rounded shadow">
+        <table className="min-w-full bg-white rounded shadow text-sm">
           <thead>
-            <tr>
-              <th className="p-2">Title</th>
-              <th>Status</th>
-              <th>Project</th>
-              <th>Assigned To</th>
-              <th>Deadline</th>
+            <tr className="text-left bg-gray-100 border-b">
+              <th className="p-3">Title</th>
+              <th className="p-3">Status</th>
+              <th className="p-3">Project</th>
+              <th className="p-3">Assigned To</th>
+              <th className="p-3">Deadline</th>
+              {(user.role === "Admin" || user.role === "Manager") && (
+                <th>Actions</th>
+              )}
             </tr>
           </thead>
           <tbody>
             {filteredTasks.map((t) => (
               <tr
                 key={t.id}
-                className="hover:bg-gray-50 cursor-pointer"
+                className="hover:bg-gray-50 border-b cursor-pointer"
                 onClick={() => navigate(`/tasks/${t.id}`)}
               >
-                <td className="p-2">{t.title}</td>
-                <td>{statusBadge(t.status)}</td>
-                <td>{t.project?.name}</td>
-                <td>{t.assignedTo?.name}</td>
-                <td>{t.deadline}</td>
+                <td className="p-3 font-medium text-gray-800">{t.title}</td>
+                <td className="p-3">{statusBadge(t.status)}</td>
+                <td className="p-3">{t.project?.name}</td>
+                <td className="p-3">{t.assignedTo?.name}</td>
+                <td className="p-3">
+                  {new Date(t.deadline).toLocaleDateString("en-GB", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}
+                </td>
+                {(user.role === "Admin" || user.role === "Manager") && (
+                  <td>
+                    <button
+                      className="text-red-500 hover:text-red-700"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(t.id);
+                      }}
+                    >
+                      <FaTrashAlt />
+                    </button>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

@@ -7,32 +7,27 @@ const Navbar = () => {
 
   if (!user) return null;
 
+  const getInitial = (name) => name?.charAt(0).toUpperCase();
+
   return (
-    <nav className="bg-gray-800 text-white p-4 flex justify-between">
-      <div className="flex space-x-4">
-        <Link to="/" className="hover:underline">
-          Dashboard
-        </Link>
-        <Link to="/projects" className="hover:underline">
-          Projects
-        </Link>
-        {(user.role === "Admin" || user.role === "Manager") && (
-          <Link to="/generate-user-stories" className="hover:underline">
-            AI Stories
-          </Link>
-        )}
-        <Link to="/tasks" className="hover:underline">
-          Tasks
-        </Link>
-        {user.role === "Admin" && (
-          <Link to="/register-user" className="hover:underline">
-            Register User
-          </Link>
-        )}
+    <nav className="bg-white shadow-md px-8 py-8 flex items-center justify-between">
+      <div className="flex items-center space-x-10">
+        <h1 className="text-2xl font-bold text-blue-600">Project Management</h1>
       </div>
-      <button onClick={logout} className="hover:underline">
-        Logout
-      </button>
+      <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2">
+          <div className="bg-blue-600 text-white w-8 h-8 flex items-center justify-center rounded-full">
+            {getInitial(user.name)}
+          </div>
+          <span className="text-gray-800 font-medium">{user.name}</span>
+        </div>
+        <button
+          onClick={logout}
+          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+        >
+          Logout
+        </button>
+      </div>
     </nav>
   );
 };

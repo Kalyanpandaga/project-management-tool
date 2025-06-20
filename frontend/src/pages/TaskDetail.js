@@ -17,6 +17,7 @@ const TaskDetail = () => {
     deadline: "",
     assignedTo: "",
   });
+  const [teamMembers, setTeamMembers] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,6 +32,12 @@ const TaskDetail = () => {
         deadline: t.deadline?.slice(0, 10) || "",
         assignedTo: t.assignedTo?.id || "",
       });
+
+      if (t.project?.id) {
+        api.get(`/projects/${t.project.id}`).then((res) => {
+          setTeamMembers(res.data.project.Users || []);
+        });
+      }
     });
   }, [id]);
 
@@ -39,8 +46,7 @@ const TaskDetail = () => {
     await api.post(`/tasks/${id}/comments`, { content: comment });
     setComment("");
     const res = await api.get(`/tasks/${id}`);
-    const t = res.data.task;
-    setComments(t.comments || []);
+    setComments(res.data.task.comments || []);
   };
 
   const handleDelete = async () => {
@@ -56,54 +62,59 @@ const TaskDetail = () => {
     user.id === task?.assignedTo?.id;
   const canDelete = user.role === "Admin" || user.role === "Manager";
 
-  if (!task) return <div>Loading...</div>;
+  if (!task) return <div className="p-6">Loading...</div>;
 
   return (
     <div className="max-w-2xl mx-auto bg-white rounded-lg shadow p-6 mt-8">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">{task.title || "Untitled Task"}</h1>
+        <h1 className="text-2xl font-bold text-indigo-700">
+          {task.title || "Untitled Task"}
+        </h1>
         <div className="flex gap-2">
           {canEdit && (
             <button
-              className="text-green-600 underline"
+              className="text-green-600 hover:underline"
               onClick={() => setEdit(!edit)}
             >
               {edit ? "Cancel" : "Edit"}
             </button>
           )}
           {canDelete && (
-            <button className="text-red-600 underline" onClick={handleDelete}>
+            <button
+              className="text-red-600 hover:underline"
+              onClick={handleDelete}
+            >
               Delete
             </button>
           )}
         </div>
       </div>
+
       {edit ? (
         <form
-          className="mb-4 space-y-2"
+          className="mb-4 space-y-4"
           onSubmit={async (e) => {
             e.preventDefault();
             await api.put(`/tasks/${id}`, form);
             setEdit(false);
             const res = await api.get(`/tasks/${id}`);
-            const t = res.data.task || res.data;
-            setTask(t);
+            setTask(res.data.task);
           }}
         >
           <input
-            className="border px-2 py-1 rounded w-full"
+            className="border px-3 py-2 rounded w-full"
             value={form.title}
             onChange={(e) => setForm({ ...form, title: e.target.value })}
             required
           />
           <textarea
-            className="border px-2 py-1 rounded w-full"
+            className="border px-3 py-2 rounded w-full"
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
             required
           />
           <select
-            className="border px-2 py-1 rounded w-full"
+            className="border px-3 py-2 rounded w-full"
             value={form.status}
             onChange={(e) => setForm({ ...form, status: e.target.value })}
           >
@@ -113,22 +124,35 @@ const TaskDetail = () => {
           </select>
           <input
             type="date"
-            className="border px-2 py-1 rounded w-full"
+            className="border px-3 py-2 rounded w-full"
             value={form.deadline}
             onChange={(e) => setForm({ ...form, deadline: e.target.value })}
             required
           />
-          <button className="bg-green-600 text-white px-4 py-2 rounded">
+          <select
+            className="border px-3 py-2 rounded w-full"
+            value={form.assignedTo}
+            onChange={(e) => setForm({ ...form, assignedTo: e.target.value })}
+            required
+          >
+            <option value="">Select Team Member</option>
+            {teamMembers.map((u) => (
+              <option key={u.id} value={u.id}>
+                {u.name} ({u.role})
+              </option>
+            ))}
+          </select>
+          <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
             Save
           </button>
         </form>
       ) : (
         <>
-          <div className="mb-4 text-gray-600 border-b pb-4">
-            <div className="mb-2 flex items-center gap-2">
-              <span className="font-semibold">Status:</span>
+          <div className="mb-4 text-gray-600 border-b pb-4 space-y-2">
+            <div>
+              <span className="font-semibold">Status:</span>{" "}
               <span
-                className={`px-2 py-1 rounded text-xs ${
+                className={`ml-2 px-2 py-1 rounded text-xs font-medium ${
                   task.status === "Done"
                     ? "bg-green-100 text-green-700"
                     : task.status === "In Progress"
@@ -139,30 +163,40 @@ const TaskDetail = () => {
                 {task.status}
               </span>
             </div>
-            <div className="mb-2 flex items-center gap-2">
-              <span className="font-semibold">Deadline:</span>
-              <span>{task.deadline?.slice(0, 10) || "-"}</span>
+            <div>
+              <span className="font-semibold">Deadline:</span>{" "}
+              <span className="ml-2">
+                {new Date(task.deadline).toLocaleDateString("en-GB", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                }) || "-"}
+              </span>
             </div>
-            <div className="mb-2 flex items-center gap-2">
-              <span className="font-semibold">Assigned To:</span>
-              <span>
+            <div>
+              <span className="font-semibold">Assigned To:</span>{" "}
+              <span className="ml-2">
                 {task.assignedTo?.name} ({task.assignedTo?.role})
               </span>
             </div>
-            <div className="mb-2 flex items-center gap-2">
-              <span className="font-semibold">Project:</span>
-              <span>{task.project?.name}</span>
+            <div>
+              <span className="font-semibold">Project:</span>{" "}
+              <span className="ml-2">{task.project?.name}</span>
             </div>
           </div>
+
           <div className="mb-4 text-gray-700">
             <span className="font-semibold">Description:</span>
-            <div className="mt-1 whitespace-pre-line">{task.description}</div>
+            <div className="mt-1 whitespace-pre-line text-sm">
+              {task.description}
+            </div>
           </div>
         </>
       )}
+
       <div className="mb-4 mt-6">
         <h3 className="font-semibold mb-2">Comments</h3>
-        <ul className="mb-2 max-h-40 overflow-y-auto bg-gray-50 rounded p-2">
+        <ul className="mb-2 max-h-40 overflow-y-auto bg-gray-50 rounded p-3 text-sm">
           {comments.length === 0 && (
             <li className="text-gray-400">No comments yet.</li>
           )}
@@ -181,7 +215,7 @@ const TaskDetail = () => {
             onChange={(e) => setComment(e.target.value)}
             required
           />
-          <button className="bg-blue-600 text-white px-4 py-2 rounded">
+          <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
             Send
           </button>
         </form>

@@ -154,20 +154,9 @@ A full-stack Project Management Tool built with **Node.js**, **Express**, **SQLi
 
 ---
 
-## Not Implemented / Known Gaps
+## Not Implemented
 
 - **AI User Story Generator** (Groq API integration) is not implemented.
 - **Unit tests** (backend/frontend) are not implemented.
-- **JWT is stored in cookies** (not localStorage).
 
 ---
-
-## Project Structure
-
-See the main project description for a detailed structure and ER diagram.
-
----
-
-## License
-
-MIT

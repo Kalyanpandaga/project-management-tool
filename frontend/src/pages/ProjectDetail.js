@@ -15,30 +15,32 @@ const ProjectDetail = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    api.get(`/projects/${id}`).then((res) => {
-      const projectData = res.data.project;
-      setProject(projectData);
-
-      setForm({ name: projectData.name, description: projectData.description });
-      setAssigned(projectData.Users?.map((u) => u.id) || []);
-    });
+    fetchProject();
     if (user.role === "Admin" || user.role === "Manager") {
       api.get("/users").then((res) => setUsers(res.data.users));
     }
   }, [id, user.role]);
 
+  const fetchProject = async () => {
+    const res = await api.get(`/projects/${id}`);
+    const p = res.data.project;
+    setProject(p);
+    setForm({ name: p.name, description: p.description });
+    setAssigned(p.Users?.map((u) => u.id) || []);
+  };
+
   const handleUpdate = async (e) => {
     e.preventDefault();
     await api.put(`/projects/${id}`, form);
     setEdit(false);
-    api.get(`/projects/${id}`).then((res) => setProject(res.data.project));
+    fetchProject();
   };
 
   const handleAssign = async (e) => {
     e.preventDefault();
     await api.post(`/projects/${id}/assign`, { userIds: assigned });
     setShowAssign(false);
-    api.get(`/projects/${id}`).then((res) => setProject(res.data.project));
+    fetchProject();
   };
 
   const handleDelete = async () => {
@@ -48,59 +50,78 @@ const ProjectDetail = () => {
     }
   };
 
-  if (!project) return <div>Loading...</div>;
+  if (!project) return <div className="p-6">Loading...</div>;
 
   return (
     <div className="max-w-2xl mx-auto bg-white rounded-lg shadow p-6 mt-8">
+      {/* Header */}
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">{project.name}</h1>
+        <h1 className="text-2xl font-bold text-indigo-700">{project.name}</h1>
         {(user.role === "Admin" || user.role === "Manager") && (
           <div className="flex gap-2">
             <button
-              className="text-green-600 underline"
+              className="text-green-600 hover:underline"
               onClick={() => setEdit(!edit)}
             >
               {edit ? "Cancel" : "Edit"}
             </button>
             <button
-              className="text-blue-600 underline"
+              className="text-blue-600 hover:underline"
               onClick={() => setShowAssign(!showAssign)}
             >
               {showAssign ? "Cancel Assign" : "Assign Team"}
             </button>
-            <button className="text-red-600 underline" onClick={handleDelete}>
+            <button
+              className="text-red-600 hover:underline"
+              onClick={handleDelete}
+            >
               Delete
             </button>
           </div>
         )}
       </div>
+
+      {/* Edit Form */}
       {edit ? (
-        <form onSubmit={handleUpdate} className="mb-4 space-y-2">
+        <form onSubmit={handleUpdate} className="space-y-4 mb-6">
           <input
-            className="border px-2 py-1 rounded w-full"
+            type="text"
+            className="w-full border px-3 py-2 rounded"
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             required
+            placeholder="Project Name"
           />
           <textarea
-            className="border px-2 py-1 rounded w-full"
+            className="w-full border px-3 py-2 rounded"
+            rows={4}
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
             required
+            placeholder="Project Description"
           />
-          <button className="bg-green-600 text-white px-4 py-2 rounded">
-            Save
+          <button
+            type="submit"
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+          >
+            Save Changes
           </button>
         </form>
       ) : (
-        <p className="mb-4 text-gray-600">{project.description}</p>
+        <p className="mb-4 text-gray-600 whitespace-pre-line text-sm">
+          {project.description}
+        </p>
       )}
+
+      {/* Assign Users */}
       {showAssign && (user.role === "Admin" || user.role === "Manager") && (
-        <form onSubmit={handleAssign} className="mb-4">
-          <h3 className="font-semibold mb-2">Assign Team Members</h3>
+        <form onSubmit={handleAssign} className="mb-6">
+          <label className="block font-semibold mb-2">
+            Assign Team Members
+          </label>
           <select
             multiple
-            className="border px-2 py-1 rounded w-full"
+            className="w-full border px-3 py-2 rounded"
             value={assigned}
             onChange={(e) =>
               setAssigned([...e.target.selectedOptions].map((o) => o.value))
@@ -112,22 +133,31 @@ const ProjectDetail = () => {
               </option>
             ))}
           </select>
-          <button className="bg-blue-600 text-white px-4 py-2 rounded mt-2">
+          <button
+            type="submit"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded mt-3"
+          >
             Assign
           </button>
         </form>
       )}
-      <div className="mb-4">
+
+      {/* Team Members */}
+      <div>
         <span className="font-semibold">Team Members:</span>
-        <div className="flex flex-wrap gap-2 mt-1">
-          {project.Users?.length === 0 && (
+        <div className="flex flex-wrap gap-2 mt-2">
+          {project.Users?.length === 0 ? (
             <span className="text-gray-400">No team members assigned.</span>
+          ) : (
+            project.Users.map((u) => (
+              <span
+                key={u.id}
+                className="bg-gray-200 text-xs px-2 py-1 rounded"
+              >
+                {u.name} ({u.role})
+              </span>
+            ))
           )}
-          {project.Users?.map((u) => (
-            <span key={u.id} className="bg-gray-200 text-xs px-2 py-1 rounded">
-              {u.name} ({u.role})
-            </span>
-          ))}
         </div>
       </div>
     </div>

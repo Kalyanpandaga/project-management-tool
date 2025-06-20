@@ -1,3 +1,4 @@
+// src/App.js
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
@@ -13,6 +14,7 @@ import UserStoryForm from "./components/UserStoryForm";
 import UserRegistration from "./components/UserRegistration";
 import Unauthorized from "./pages/Unauthorized";
 import Navbar from "./components/Navbar";
+import SidebarLayout from "./components/SidebarLayout";
 
 const App = () => {
   return (
@@ -24,61 +26,34 @@ const App = () => {
           <Route path="/unauthorized" element={<Unauthorized />} />
 
           <Route
-            path="/"
             element={
               <ProtectedRoute>
-                <Dashboard />
+                <SidebarLayout />
               </ProtectedRoute>
             }
-          />
-          <Route
-            path="/projects"
-            element={
-              <ProtectedRoute>
-                <ProjectList />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/projects/:id"
-            element={
-              <ProtectedRoute>
-                <ProjectDetail />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/tasks"
-            element={
-              <ProtectedRoute>
-                <TaskList />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/tasks/:id"
-            element={
-              <ProtectedRoute>
-                <TaskDetail />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/generate-user-stories"
-            element={
-              <ProtectedRoute roles={["Admin", "Manager"]}>
-                <UserStoryForm />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/register-user"
-            element={
-              <ProtectedRoute roles={["Admin"]}>
-                <UserRegistration />
-              </ProtectedRoute>
-            }
-          />
+          >
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/projects" element={<ProjectList />} />
+            <Route path="/projects/:id" element={<ProjectDetail />} />
+            <Route path="/tasks" element={<TaskList />} />
+            <Route path="/tasks/:id" element={<TaskDetail />} />
+            <Route
+              path="/generate-user-stories"
+              element={
+                <ProtectedRoute roles={["Admin", "Manager"]}>
+                  <UserStoryForm />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/register-user"
+              element={
+                <ProtectedRoute roles={["Admin"]}>
+                  <UserRegistration />
+                </ProtectedRoute>
+              }
+            />
+          </Route>
         </Routes>
       </AuthProvider>
     </Router>
