@@ -66,10 +66,8 @@ const deleteProject = async (req, res, next) => {
     if (!project)
       return next(createError(404, "PROJECT_NOT_FOUND", "Project not found"));
     await project.destroy();
-    console.log("Project deleted successfully");
     res.status(204).json({ message: "Project deleted" });
   } catch (err) {
-    console.log(err);
     next(err);
   }
 };
