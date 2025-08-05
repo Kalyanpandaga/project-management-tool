@@ -14,7 +14,17 @@ const UserStory = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: false,
     },
+    projectId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: "Projects",
+        key: "id",
+      },
+      onDelete: "CASCADE",
+    },
   },
+
   {
     timestamps: true,
     updatedAt: false,

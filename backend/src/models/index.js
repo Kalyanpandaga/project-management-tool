@@ -6,22 +6,27 @@ const Comment = require("./Comment");
 const UserStory = require("./UserStory");
 const ProjectUsers = require("./ProjectUsers");
 
-// Associations
-User.hasMany(Task, { foreignKey: "assignedTo" });
+// TASK ↔ USER
+User.hasMany(Task, { foreignKey: "assignedTo", onDelete: "CASCADE" });
 Task.belongsTo(User, { foreignKey: "assignedTo", as: "assignedToUser" });
 
-User.hasMany(Comment);
-Comment.belongsTo(User);
+// COMMENT ↔ USER
+User.hasMany(Comment, { foreignKey: "userId", onDelete: "CASCADE" });
+Comment.belongsTo(User, { foreignKey: "userId" });
 
-Task.hasMany(Comment);
-Comment.belongsTo(Task);
+// COMMENT ↔ TASK
+Task.hasMany(Comment, { foreignKey: "taskId", onDelete: "CASCADE" });
+Comment.belongsTo(Task, { foreignKey: "taskId" });
 
-Project.hasMany(Task, { foreignKey: "projectId" });
+// TASK ↔ PROJECT
+Project.hasMany(Task, { foreignKey: "projectId", onDelete: "CASCADE" });
 Task.belongsTo(Project, { foreignKey: "projectId" });
 
-Project.hasMany(UserStory);
-UserStory.belongsTo(Project);
+// USER STORY ↔ PROJECT
+Project.hasMany(UserStory, { foreignKey: "projectId", onDelete: "CASCADE" });
+UserStory.belongsTo(Project, { foreignKey: "projectId" });
 
+// PROJECT ↔ USER (Many-to-Many)
 Project.belongsToMany(User, { through: ProjectUsers });
 User.belongsToMany(Project, { through: ProjectUsers });
 

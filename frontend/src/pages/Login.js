@@ -70,6 +70,44 @@ const Login = () => {
         </button>
 
         {errorMsg && <p className="text-red-500 text-sm mt-2">* {errorMsg}</p>}
+        {/* Testing Credentials Section */}
+        <div className="mt-8">
+          <h3 className="text-lg font-semibold mb-3 text-gray-700">
+            Testing Credentials
+          </h3>
+          <div className="flex flex-col gap-2">
+            <button
+              type="button"
+              className="bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded transition"
+              onClick={() => {
+                setEmail("Developer@example.com");
+                setPassword("Developer@123");
+              }}
+            >
+              Use Developer Credentials
+            </button>
+            <button
+              type="button"
+              className="bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded transition"
+              onClick={() => {
+                setEmail("Manager@example.com");
+                setPassword("Manager@123");
+              }}
+            >
+              Use Manager Credentials
+            </button>
+            <button
+              type="button"
+              className="bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded transition"
+              onClick={() => {
+                setEmail("Admin@example.com");
+                setPassword("Admin@123");
+              }}
+            >
+              Use Admin Credentials
+            </button>
+          </div>
+        </div>
       </form>
     </div>
   );

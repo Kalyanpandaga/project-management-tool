@@ -31,6 +31,7 @@ const Task = sequelize.define(
         model: "Projects",
         key: "id",
       },
+      onDelete: "CASCADE",
     },
     assignedTo: {
       type: DataTypes.UUID,
@@ -39,6 +40,7 @@ const Task = sequelize.define(
         model: "Users",
         key: "id",
       },
+      onDelete: "SET NULL",
     },
   },
   {

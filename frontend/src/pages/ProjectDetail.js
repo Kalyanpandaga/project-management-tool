@@ -12,6 +12,7 @@ const ProjectDetail = () => {
   const [users, setUsers] = useState([]);
   const [assigned, setAssigned] = useState([]);
   const [showAssign, setShowAssign] = useState(false);
+  const [assignError, setAssignError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,9 +39,21 @@ const ProjectDetail = () => {
 
   const handleAssign = async (e) => {
     e.preventDefault();
-    await api.post(`/projects/${id}/assign`, { userIds: assigned });
-    setShowAssign(false);
-    fetchProject();
+    setAssignError(""); // Reset error
+    try {
+      await api.post(`/projects/${id}/assign`, { userIds: assigned });
+      setShowAssign(false);
+      fetchProject();
+    } catch (err) {
+      if (err.response && err.response.status === 400) {
+        setAssignError(
+          err.response.data?.message ||
+            "Failed to assign members. Please check your selection and try again."
+        );
+      } else {
+        setAssignError("An unexpected error occurred. Please try again.");
+      }
+    }
   };
 
   const handleDelete = async () => {
@@ -133,9 +146,18 @@ const ProjectDetail = () => {
               </option>
             ))}
           </select>
+          {assignError && (
+            <p className="text-red-500 text-sm mt-2">{assignError}</p>
+          )}
           <button
             type="submit"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded mt-3"
+            className={`bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded mt-3
+                        ${
+                          assigned.length === 0
+                            ? "opacity-50 cursor-not-allowed bg-gray-400 hover:bg-gray-400"
+                            : ""
+                        }`}
+            disabled={assigned.length === 0}
           >
             Assign
           </button>

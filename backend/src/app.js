@@ -35,7 +35,7 @@ app.listen(PORT, async () => {
     await sequelize.authenticate();
     console.log("✅ Database connected");
 
-    await sequelize.sync();
+    await sequelize.sync({ force: false });
     console.log("✅ Models synced with the database");
   } catch (error) {
     console.error("❌ Database connection failed:", error);

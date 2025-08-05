@@ -166,6 +166,12 @@ const TaskList = () => {
               </option>
             ))}
           </select>
+          {/* Show message if no projects */}
+          {projects.length === 0 && (
+            <p className="text-red-500 text-sm mt-1">
+              No projects currently. Please create a project first.
+            </p>
+          )}
           <select
             className="border px-3 py-2 rounded w-full"
             value={form.assignedTo}
@@ -180,6 +186,13 @@ const TaskList = () => {
               </option>
             ))}
           </select>
+          {/* Show message if no team members for selected project */}
+          {form.projectId && teamMembers.length === 0 && (
+            <p className="text-red-500 text-sm mt-1">
+              No assigned members for this project. Please go to the project
+              page and assign members.
+            </p>
+          )}
           <button
             type="submit"
             className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"

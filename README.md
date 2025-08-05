@@ -105,11 +105,11 @@ A full-stack Project Management Tool built with **Node.js**, **Express**, **SQLi
 
 ## User Credentials (Demo)
 
-| Role      | Email               | Password    |
-| --------- | ------------------- | ----------- |
-| Admin     | Admin@example.com   | Admin@123   |
-| Manager   | Manager@example.com | Manager@123 |
-| Developer | kalyan@example.com  | Kalyan@123  |
+| Role      | Email                 | Password      |
+| --------- | --------------------- | ------------- |
+| Admin     | Admin@example.com     | Admin@123     |
+| Manager   | Manager@example.com   | Manager@123   |
+| Developer | Developer@example.com | Developer@123 |
 
 ---
 

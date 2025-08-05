@@ -14,22 +14,6 @@ const Comment = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: false,
     },
-    taskId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-      references: {
-        model: "Tasks",
-        key: "id",
-      },
-    },
-    userId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-      references: {
-        model: "Users",
-        key: "id",
-      },
-    },
   },
   {
     timestamps: true,
